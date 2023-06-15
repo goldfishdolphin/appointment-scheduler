@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Appointments</title>
+    <link rel="stylesheet" href="./styles/main.scss">
+</head>
+<h2>Appointments Scheduler</h2>
+<form action="/appointment" method="POST">
+    <div class="date">
+        <label for="slot">Choose a time for your appointment: </label>
+        <input type="datetime-local" id="'slot" name="slotdate" min="2023-06-01T00:00" max="2026-06-30T00:00" step="300"
+            required />
+        <span class="validity"></span>
+    </div>
+    <div>
+        <label for="name">Full Name: </label>
+        <input type="text" id="name" name="fullname" placeholder="Please Enter Your Full Name">
+    </div>
+    <div>
+        <label for="tel">Phone Number</label>
+        <input type="tel" name="tel" id="tel" required>
+        <span class="validity"></span>
+    </div>
+    <div>
+        <button class="btn btn-primary" type="button">
+
+            Book a slot
+        </button>
+    </div>
+</form>
+
+<body>
+
+</body>
+
+</html>
