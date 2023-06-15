@@ -1,0 +1,9 @@
+input:invalid + span::after{
+    content: "✖";
+    padding: 10px;;
+}
+
+input:valid + span::after{
+    content:"✓";
+    padding: 10px;;
+}
