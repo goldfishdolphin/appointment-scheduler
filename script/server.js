@@ -81,5 +81,4 @@ app.post('/appointments', async (request, response) => {
     };
 
 
-
 });
