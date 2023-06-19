@@ -29,3 +29,57 @@ app.use(express.static('public'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Create appointment endpoint
+app.post('/appointments', async (request, response) => {
+    let phoneNumber = request.body.phonenumber;
+    let slot = request.body.slotdate;
+    let [date, time] = getDateTime(slot);
+    // checks if slot is available
+    checkIfAvailable = async (slot) => {
+        let snapshot = await ref.orderByChild('date').once('value');
+        let available = true;
+        snapshot.forEach((data) => {
+            // console.log(data);
+            let dataval = data.val();
+            for (let key in dataval) {
+                let datapoint = dataval[key];
+                if (slot === datapoint) {
+                    available = false;
+                }
+            }
+        });
+        console.log(slot);
+        return available;
+    };
+    // Adds to the database
+    addToDatabase = () => {
+        let code = uuidv4();
+        ref.child(code).se({
+            date: slot,
+
+            userId: code
+        });
+        return code;
+    };
+    // Sends SMS back to the user's phone using the Vonage Message API
+    // Sends an SMS back to the user's phone using the Vonage Messages API
+    sendSMStoUser = async (code) => {
+        const to = phonenumber;
+        const text = `Meeting booked at ${time} on date: ${date}. Please save this code: ${code} in case you'd like to cancel your appointment.`;
+        const result = await new Promise((resolve, reject) => {
+            vonage.messages.send(
+                new SMS(text, process.env.VONAGE_TO_NUMBER, "Vonage"),
+                (err, data) => {
+                    if (err) {
+                        console.error(err);
+                    } else {
+                        console.log(data.message_uuid);
+                    }
+                }
+            );
+        });
+    };
+
+
+
+});
