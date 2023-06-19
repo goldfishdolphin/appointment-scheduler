@@ -7,6 +7,9 @@ const Vonage = require('@vonage/server-sdk');
 const { v4: uuidv4 } = require('uuid');
 
 const serviceAccount = require('../serviceAccountKey.json');
+const getDateTime = (slot) => {
+    return slot.split('T');
+};
 
 // Initializes firebase
 admin.initializeApp({
@@ -25,3 +28,4 @@ ref = admin.database().ref('/myAppointments');
 app.use(express.static('public'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
