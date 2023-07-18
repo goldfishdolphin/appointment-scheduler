@@ -1,45 +1,49 @@
-require('dotenv').config();
-const express = require('express');
-const app = express();
+require("dotenv").config();
+const express = require("express");
+const app = require("express")();
 const port = 3000;
-const admin = require('firebase-admin');
-const Vonage = require('@vonage/server-sdk');
-const { v4: uuidv4 } = require('uuid');
-
-const serviceAccount = require('../serviceAccountKey.json');
-const getDateTime = (slot) => {
-    return slot.split('T');
-};
+const admin = require("firebase-admin");
+const { Vonage } = require("@vonage/server-sdk");
+const { SMS } = require('@vonage/sms');
+const { v4: uuidv4 } = require("uuid");
+const serviceAccount = require("../serviceAccountKey.json");
 
 // Initializes firebase
 admin.initializeApp({
     credential: admin.credential.cert(serviceAccount),
     databaseURL: `${process.env.FIREBASE_DATABASE_URL}`,
 });
+// A Reference represents a specific location in your Database and can be 
+// used for reading or writing data to that Database location.
+ref = admin.database().ref("/myAppointments");
+
 //Initialize the Vonage API object
+
 const vonage = new Vonage({
     apiKey: process.env.VONAGE_API_KEY,
     apiSecret: process.env.VONAGE_API_SECRET,
 });
 
-// A Reference represents a specific location in your Database and can be 
-// used for reading or writing data to that Database location.
-ref = admin.database().ref('/myAppointments');
-app.use(express.static('public'));
+app.use(express.static("public"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+const getDateTime = (slot) => {
+    return slot.split("T");
+};
 // Create appointment endpoint
-app.post('/appointments', async (request, response) => {
-    let phoneNumber = request.body.phonenumber;
+app.post("/appointment", async (request, response) => {
+    console.log(request);
+    let phonenumber = request.body.phonenumber;
     let slot = request.body.slotdate;
     let [date, time] = getDateTime(slot);
-    // checks if slot is available
+
+    // Checks if a slot is available
     checkIfAvailable = async (slot) => {
-        let snapshot = await ref.orderByChild('date').once('value');
+        let snapshot = await ref.orderByChild("date").once("value");
+
         let available = true;
         snapshot.forEach((data) => {
-            // console.log(data);
             let dataval = data.val();
             for (let key in dataval) {
                 let datapoint = dataval[key];
@@ -48,17 +52,18 @@ app.post('/appointments', async (request, response) => {
                 }
             }
         });
-        console.log(slot);
         return available;
     };
-    // Adds to the database
+
+    // Adds the slot to the database
     addToDatabase = () => {
         let code = uuidv4();
-        ref.child(code).se({
-            date: slot,
 
-            userId: code
+        ref.child(code).set({
+            date: slot,
+            userId: code,
         });
+
         return code;
     };
     // Sends SMS back to the user's phone using the Vonage Message API
@@ -80,5 +85,32 @@ app.post('/appointments', async (request, response) => {
         });
     };
 
+    let available = await checkIfAvailable(slot);
 
+    if (available) {
+        let code = addToDatabase();
+        await sendSMStoUser(code);
+        response.send(`This slot is available, booking it for you now: ${slot}`);
+    } else {
+        // Sends user error
+        response.send(
+            `Sorry, you'll need to choose a different slot.${slot} is already busy.`
+        );
+    }
+});
+
+app.post("/cancelAppointment", async (request, response) => {
+    let code = request.body.code;
+
+    // Removes slot from the database
+    removeSlotFromDB = (code) => {
+        ref.child(code).remove();
+    };
+    removeSlotFromDB(code);
+
+    response.send(`This slot has been removed.`);
+});
+
+app.listen(port, () => {
+    console.log(`I run on port ${port}`);
 });
