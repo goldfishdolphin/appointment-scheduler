@@ -12,27 +12,24 @@
 </head>
 
 <body>
-    <h2>Appointments Scheduler</h2>
-    <form action="/appointment" method="POST">
+    <h1>Appointments Scheduler</h1>
+    <h3>Book your appointments today</h3>
+    <form action="/appointment" method="POST" id="form">
+        <div>
+            <input type="text" id="name" name="fullname" placeholder="Enter Your Full Name" class="form-control" />
+        </div>
         <div class="date">
-            <label for="slot" class="form-label">Choose a time for your appointment: </label>
             <input type="datetime-local" id="slot" name="slotdate" min="2023-06-01T00:00" max="2026-06-30T00:00"
                 step="300" required />
             <span class="validity"></span>
         </div>
 
         <div>
-            <label for="name" class="form-label">Full Name: </label>
-            <input type="text" id="name" name="fullname" placeholder="Please Enter Your Full Name"
-                class="form-control" />
-        </div>
-        <div>
-            <label for="tel" class="form-label">Phone Number: </label>
-            <input type="tel" name="tel" id="tel" required class="form-control">
+            <input type="tel" name="tel" id="tel" size='50' required placeholder="Enter Your Phone Number">
             <span class="validity"></span>
         </div>
         <div>
-            <button class="btn btn-primary" type="button">
+            <button class="btn btn-primary" type="submit">
 
                 Book a slot
             </button>

@@ -1,7 +1,21 @@
-body{   margin: 10px;
-    padding: 20px;
-    background-color: #ceddef;
+body {   
+    background-color:#152733;
+    color: whitesmoke;
+    align-items: center;
+    justify-content: center;
+    display: inline-block;
+    
 }
+
+form{
+    padding: 20px;
+    height: 100vh;
+}
+* {
+    margin: 20px;
+    padding: 10px;
+  }
+
 input:invalid + span:after{
     content: "✖";
     padding: 5px;;
@@ -12,4 +26,7 @@ input:valid + span:after{
     content:"✓";
     padding: 5px;;
     color: green;
+}
+input{
+    border-radius: 8px;
 }
